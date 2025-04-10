@@ -1,6 +1,5 @@
 import pygame
 import math as m
-pygame.init()
 def rotate(x,y,z,rotX,rotY,rotZ):
     #x
     y,z=y*m.cos(m.radians(rotX))-z*m.sin(m.radians(rotX)),y*m.sin(m.radians(rotX))+z*m.cos(m.radians(rotX))
@@ -64,6 +63,7 @@ class Renderer:
                 if rotatedP1.z<0 and rotatedP2.z<0 and rotatedP3.z<0:
                     continue
                 finalTriangles.append(Triangle(rotatedP1,rotatedP2,rotatedP3,0,0,0,j.colour))
+                # This is close to Painter's algorithm
             for j in sorted(finalTriangles,key=Triangle.zavg,reverse=True):
                 pygame.draw.polygon(self.screen,j.colour,[self.rasterise(j.p1),self.rasterise(j.p2),self.rasterise(j.p3)])
                 pygame.draw.aalines(self.screen,(0,0,0),True,[self.rasterise(j.p1),self.rasterise(j.p2),self.rasterise(j.p3)])
@@ -77,41 +77,3 @@ class Renderer:
         rx=(x/z)*self.focalLen+(self.screenX/2)
         ry=(y/z)*self.focalLen+(self.screenY/2)
         return (rx,ry)
-camera=Object([],0,0,0,0,0,0)
-triangle1=Triangle(Point(-50,-50,0),Point(-50,50,0),Point(50,-50,0),0,0,0,(255,0,0))
-triangle2=Triangle(Point(-50,50,0),Point(50,50,0),Point(50,-50,0),0,0,0,(0,0,255))
-triangle3=Triangle(Point(-50,50,0),Point(50,50,0),Point(-50,50,100),90,0,0,(0,255,0))
-object=Object([triangle1,triangle2,triangle3],0,0,100,0,0,0)
-renderer=Renderer([object],1720,981,camera,focalLen=1000)
-running=True
-screen=pygame.display.set_mode((1720,981))
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    keys=pygame.key.get_pressed()
-    if keys[pygame.K_ESCAPE]:
-        running=False
-    if keys[pygame.K_w]:
-        camera.z+=3
-    if keys[pygame.K_s]:
-        camera.z-=3
-    if keys[pygame.K_a]:
-        camera.x-=3
-    if keys[pygame.K_d]:
-        camera.x+=3
-    if keys[pygame.K_LSHIFT]:
-        camera.y+=3
-    if keys[pygame.K_TAB]:
-        camera.y-=3
-    if keys[pygame.K_q]:
-        camera.rotX-=3
-    if keys[pygame.K_e]:
-        camera.rotX+=3
-    if keys[pygame.K_0]:
-        renderer.focalLen+=1
-    if keys[pygame.K_MINUS]:
-        renderer.focalLen-=1
-    screen.blit(renderer.frame())
-    pygame.display.flip()
-pygame.quit()
